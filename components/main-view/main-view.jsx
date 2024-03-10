@@ -4,18 +4,14 @@ import { MovieView } from "../movie-view/movie-view";
 
 export const MainView = () => {
   const [movies, setMovies] = useState([]);
+
   const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect(() => {
     fetch("https://myflix2024-447746b678a9.herokuapp.com/movies")
       .then((response) => response.json())
       .then((data) => {
-        // Update the movies state with the fetched data
-        console.log("Fetched movies:", data);
-        setMovies(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching movies:", error);
+        console.log("movies from api:", data);
       });
   }, []);
 
@@ -28,7 +24,7 @@ export const MainView = () => {
   if (movies.length === 0) {
     return <div>The list is empty!</div>;
   }
-  
+
   return (
     <div>
       {movies.map((movie) => (
