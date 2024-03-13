@@ -1,7 +1,7 @@
-import { useState, useEffect, } from "react";
+import { useState, useEffect } from "react";
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
-import {LoginView} from "../login-view/loginview";
+import { LoginView } from "../login-view/loginview";
 import { SignupView } from "../signup-view/signup-view";
 
 export const MainView = () => {
@@ -15,7 +15,7 @@ export const MainView = () => {
   useEffect(() => {
     if (!token) return;
  
-    fetch("..../movies", {
+    fetch("https://myflix2024-447746b678a9.herokuapp.com/movies", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
@@ -58,11 +58,11 @@ return (
         </button>
 
     {movies.map((movie) => (
-      <BookCard
+      <MovieCard
         key={movie.id}
-        book={movie}
-        onBookClick={(newSelectedMovie) => {
-          setSelectedBook(newSelectedMovie);
+        movie={movie}
+        onMovieClick={(newSelectedMovie) => {
+          setSelectedMovie(newSelectedMovie);
         }}
       />
     ))}
