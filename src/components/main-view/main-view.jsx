@@ -15,7 +15,7 @@ export const MainView = () => {
   useEffect(() => {
     if (!token) return;
 
-    fetch("https://myflix2024-447746b678a9.herokuapp.com/movies", {
+    fetch("https://fierce-fortress-37859-bd3c98eebee1.herokuapp.com/movies", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
