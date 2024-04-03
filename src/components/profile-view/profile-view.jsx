@@ -22,7 +22,7 @@ export const ProfileView = ({ user, handleAddToFavorites, movies }) => {
   const [birthday, setBirthday] = useState(storedBirthday || "");
 
   const favoriteMovies =
-    localUser && localUser.FavoriteMovies
+    movies && localUser && localUser.FavoriteMovies
       ? movies.filter((m) => localUser.FavoriteMovies.includes(m._id))
       : [];
   console.log(favoriteMovies);
@@ -102,7 +102,10 @@ export const ProfileView = ({ user, handleAddToFavorites, movies }) => {
   return (
     <div>
       <div style={{ paddingTop: "20px" }}>
-        <UserInfo name={user && user.Username} email={user && user.Email} />
+        <UserInfo
+          name={user && user.Username ? user.Username : ""} // Provide an empty string if user.Username is null
+          email={user && user.Email ? user.Email : ""} // Provide an empty string if user.Email is null
+        />
       </div>
 
       <div style={{ paddingTop: "20px" }}>

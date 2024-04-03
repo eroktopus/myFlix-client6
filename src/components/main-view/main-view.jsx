@@ -7,6 +7,8 @@ import { NavigationBar } from "../navigation-bar/navigation-bar";
 import { ProfileView } from "../profile-view/profile-view";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import Form from "react-bootstrap/Form";
+import { debounce } from "lodash";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 export const MainView = () => {
@@ -16,6 +18,8 @@ export const MainView = () => {
   const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [moviesFiltered, setMoviesFiltered] = useState([]);
 
   const handleAddToFavorites = async (movie) => {
     try {
@@ -52,8 +56,21 @@ export const MainView = () => {
       .then((response) => response.json())
       .then((movies) => {
         setMovies(movies);
+        setMoviesFiltered(movies);
       });
   }, [token]);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    debouncedSearch(e.target.value);
+  };
+
+  const debouncedSearch = debounce((searchTerm) => {
+    const filteredMovies = movies.filter((movie) =>
+      movie.Title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setMoviesFiltered(filteredMovies);
+  }, 300);
 
   return (
     <BrowserRouter>
@@ -104,22 +121,14 @@ export const MainView = () => {
               />
             }
           />
-
           <Route
             exact
             path="/movies/:title"
             element={
-              <div className="pt-4">
-                {!user ? (
-                  <Navigate to="/login" replace />
-                ) : movies.length === 0 ? (
-                  <Col>The list is empty!</Col>
-                ) : (
-                  <Col md={8}>
-                    <MovieView movies={movies} />
-                  </Col>
-                )}
-              </div>
+              <MovieView
+                movies={movies}
+                onAddToFavorites={handleAddToFavorites} // Pass the function here
+              />
             }
           />
           <Route
@@ -128,23 +137,49 @@ export const MainView = () => {
               <>
                 {!user ? (
                   <Navigate to="/login" replace />
-                ) : movies.length === 0 ? (
-                  <Col>The list is empty!</Col>
                 ) : (
                   <>
-                    {movies.map((movie) => (
-                      <Col className="mb-4 pt-4" key={movie.Title} md={3}>
-                        {" "}
-                        {/* Add padding top here */}
-                        <MovieCard
-                          movie={movie}
-                          onMovieClick={(newSelectedMovie) => {
-                            setSelectedMovie(newSelectedMovie);
-                          }}
-                          onAddToFavorites={handleAddToFavorites}
-                        />
+                    <Row>
+                      <Col md={12}>
+                        <Form className="pt-3 pb-3">
+                          <Form.Control
+                            type="text"
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            placeholder="Search myFlix..."
+                            className="searchBar"
+                            style={{ width: "300px" }}
+                          />
+                        </Form>
                       </Col>
-                    ))}
+                    </Row>
+                    <Row>
+                      {moviesFiltered.length === 0
+                        ? movies.map((movie) => (
+                            <Col className="mb-4 pt-4" key={movie.Title} md={3}>
+                              <MovieCard
+                                movie={movie}
+                                onMovieClick={(newSelectedMovie) => {
+                                  setSelectedMovie(newSelectedMovie);
+                                }}
+                                onAddToFavorites={handleAddToFavorites}
+                              />
+                            </Col>
+                          ))
+                        : moviesFiltered.map((movie) => (
+                            <Col
+                              className="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-xs-6 col-xxs-6 col-4 mb-5 movieCardTile"
+                              key={movie._id}
+                            >
+                              <MovieCard
+                                movie={movie}
+                                user={user}
+                                token={token}
+                                onAddToFavorites={handleAddToFavorites}
+                              />
+                            </Col>
+                          ))}
+                    </Row>
                   </>
                 )}
               </>
